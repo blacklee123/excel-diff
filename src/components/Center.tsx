@@ -1,6 +1,6 @@
 import React from "react";
 import "antd/dist/antd.css";
-import { Button } from "antd";
+import { Button, Space } from "antd";
 
 interface DiffBtn {
   btntext: string;
@@ -11,35 +11,11 @@ interface DiffBtn {
 
 const CenterHooks = (props: DiffBtn) => {
   return (
-    <div style={{ textAlign: "center" }}>
-      <Button
-        type="dashed"
-        size="small"
-        style={{ marginTop: 150 }}
-        onClick={(e) => props.onSampleBtnClick(e)}
-      >
-        {"< Sample >"}
-      </Button>
-      <Button
-        ref={React.createRef()}
-        id="btn-diff"
-        type="primary"
-        style={{ marginTop: 10 }}
-        size="large"
-        onClick={(e) => props.onDiffBtnClick(e)}
-      >
-        {props.btntext}
-      </Button>
-      <Button
-        ref={React.createRef()}
-        id="btn-clean"
-        type="default"
-        style={{ marginTop: 10 }}
-        onClick={(e) => props.onResetBtnClick(e)}
-      >
-        {" << reset >> "}
-      </Button>
-    </div>
+    <Space direction="vertical">
+      <Button onClick={(e) => props.onSampleBtnClick(e)} > {"< Sample >"} </Button>
+      <Button ref={React.createRef()} id="btn-diff" type="primary" style={{ marginTop: 10 }} size="large" onClick={(e) => props.onDiffBtnClick(e)} > {props.btntext} </Button>
+      <Button ref={React.createRef()} id="btn-clean" type="default" style={{ marginTop: 10 }} onClick={(e) => props.onResetBtnClick(e)} > {" << reset >> "} </Button>
+    </Space>
   );
 };
 

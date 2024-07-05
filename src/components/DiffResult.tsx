@@ -22,7 +22,7 @@ const DiffResultHooks = (props: DiffResult) => {
 
   return (
     <>
-      <span style={{ fontSize: 24 }}>{"比較結果"}</span>
+      <span style={{ fontSize: 24 }}>{"比较结果"}</span>
       <HotTable
         ref={props.hotTableComponentDiffResult}
         data={[[""]]}
