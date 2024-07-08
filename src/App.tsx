@@ -1,11 +1,10 @@
 import React, { useState, useRef } from "react";
 import { WorkBook } from "xlsx/types";
-import { Row, Col, Select } from "antd";
+import { Row, Col } from "antd";
 
-import { ExcelHelper, ExcelDomain, SheetDomain } from "./utils/ExcelHelper";
+import { ExcelHelper } from "./utils/ExcelHelper";
 import { diff } from "./utils/Diff";
 import LeftHooks from "./components/Left";
-import RightHooks from "./components/Right";
 import CenterHooks from "./components/Center";
 import DiffResultHooks from "./components/DiffResult";
 
@@ -15,137 +14,107 @@ import "./App.css";
 function App() {
   var excelHelper = new ExcelHelper();
   const [leftsheetname, setLeftSheetname] = useState("Sheet1");
-  const [leftsheetlist, setLeftSheetlist] = useState<any[] | null>(null);
-  const [hotTableComponentLeft] = useState(React.createRef());
+  const [leftsheetlist, setLeftSheetlist] = useState<string[]>([]);
   const [leftsheetdata, setLeftSheetData] = useState(JSON.parse(JSON.stringify(ExcelHelper.BlankData(12, 8))));
-
   const [leftWorkbook, setLeftWorkbook] = useState<WorkBook>();
-  const [rightsheetname, setRightSheetname] = useState("Sheet1");
-  const [rightsheetlist, setRightSheetlist] = useState<any[] | null>(null);
-  const [hotTableComponentRight] = useState(React.createRef());
-  const [rightsheetdata, setRightSheetData] = useState(JSON.parse(JSON.stringify(ExcelHelper.BlankData(12, 8))));
-
-  const [rightWorkbook, setRightWorkbook] = useState<WorkBook>();
-  const [hotTableComponentDiffResult] = useState(React.createRef());
-
   const leftFileSelectRef = useRef<any>(null);
+
+  const [rightsheetname, setRightSheetname] = useState("Sheet1");
+  const [rightsheetlist, setRightSheetlist] = useState<string[]>([]);
+  const [rightsheetdata, setRightSheetData] = useState(JSON.parse(JSON.stringify(ExcelHelper.BlankData(12, 8))));
+  const [rightWorkbook, setRightWorkbook] = useState<WorkBook>();
   const rightFileSelectRef = useRef<any>(null);
 
-  const fileHandler = (event: React.ChangeEvent<HTMLInputElement>,field: string) => {
+  const [diffData, setDiffData] = useState<[][]>([[]]);
+
+  const fileHandler = (event: React.ChangeEvent<HTMLInputElement>, field: string) => {
     event.persist();
     if (event.target.files) {
       let fileObj = event.target.files[0];
 
       if (fileObj) {
-        excelHelper.convertFileToExcel(
-          fileObj,
-          (err: any, resp: ExcelDomain) => {
-            if (err) {
-              console.log(err);
-            } else {
-              let sheetnames = [];
-              for (var i = 0; i < resp.sheets.length; i++) {
-                sheetnames.push(
-                  <Select.Option key={resp.sheets[i]} value={resp.sheets[i]}>
-                    {resp.sheets[i]}
-                  </Select.Option>
-                );
-              }
-              if (field === "left") {
-                setLeftSheetname(resp.sheets[0]);
-                setLeftSheetlist(sheetnames);
-                setLeftSheetData(resp.items);
-                setLeftWorkbook(resp.workbook);
-              } else {
-                setRightSheetname(resp.sheets[0]);
-                setRightSheetlist(sheetnames);
-                setRightSheetData(resp.items);
-                setRightWorkbook(resp.workbook);
-              }
-            }
+        excelHelper.convertFileToExcel(fileObj).then((resp) => {
+          if (field === "left") {
+            setLeftSheetname(resp.sheets[0]);
+            setLeftSheetlist(resp.sheets);
+            setLeftSheetData(resp.items);
+            setLeftWorkbook(resp.workbook);
+          } else {
+            setRightSheetname(resp.sheets[0]);
+            setRightSheetlist(resp.sheets);
+            setRightSheetData(resp.items);
+            setRightWorkbook(resp.workbook);
           }
-        );
+        });
       }
     }
   };
 
   const onSheetFieldChange = (selectedSheetName: string, field: string) => {
-    var wb = null;
-    if (field === "left") wb = leftWorkbook;
-    else wb = rightWorkbook;
+    var wb = field === "left" ? leftWorkbook : rightWorkbook;
 
-    if (wb !== undefined && wb !== null && selectedSheetName !== undefined) {
-      excelHelper.getSheet(
-        wb,
-        selectedSheetName,
-        (err: any, resp: SheetDomain) => {
-          if (err) {
-            console.log(err);
-          } else {
-            if (field === "left") {
-              setLeftSheetname(selectedSheetName);
-              setLeftSheetData(resp.items);
-            } else {
-              setRightSheetname(selectedSheetName);
-              setRightSheetData(resp.items);
-            }
-          }
+    if (wb) {
+      excelHelper.getSheet(wb, selectedSheetName).then((resp) => {
+        if (field === "left") {
+          setLeftSheetname(selectedSheetName);
+          setLeftSheetData(resp.items);
+        } else {
+          setRightSheetname(selectedSheetName);
+          setRightSheetData(resp.items);
         }
+      }
       );
     }
   };
 
+  const onRset = () => {
+    leftFileSelectRef.current.value = "";
+    rightFileSelectRef.current.value = "";
+    setLeftSheetlist([]);
+    setRightSheetlist([]);
+    setLeftSheetname("Sheet1");
+    setRightSheetname("Sheet1");
+    setLeftSheetData(JSON.parse(JSON.stringify(ExcelHelper.BlankData(12, 8))));
+    setRightSheetData(JSON.parse(JSON.stringify(ExcelHelper.BlankData(12, 8))));
+    setDiffData([[]]);
+  }
+
+  const onDiff = () => {
+    setDiffData(diff(leftsheetdata, rightsheetdata))
+  }
+
+  const onSample = () => {
+    setLeftSheetData(ExcelHelper.SampleDataLeft);
+    setRightSheetData(ExcelHelper.SampleDataRight);
+  }
+
   return (
-    <Row gutter={[24, 24]} style={{padding: "48px"}}>
+    <Row gutter={[24, 24]} style={{ padding: "48px" }}>
       <Col span={11}>
         <LeftHooks
           sheetname={leftsheetname}
           sheetlist={leftsheetlist}
           onFileSelectChange={(e) => fileHandler(e, "left")}
           onSheetSelectChange={(e) => onSheetFieldChange(e, "left")}
-          hotTableComponentLeft={hotTableComponentLeft}
           sheetdata={leftsheetdata}
           fileRef={leftFileSelectRef}
         />
       </Col>
       <Col span={2}>
-        <CenterHooks
-          btntext=">> Diff <<"
-          onDiffBtnClick={() => diff(leftsheetdata, rightsheetdata, hotTableComponentDiffResult)}
-          onSampleBtnClick={(e) => {
-            setLeftSheetData(ExcelHelper.SampleDataLeft);
-            setRightSheetData(ExcelHelper.SampleDataRight);
-          }}
-          onResetBtnClick={(e) => {
-            // window.location.reload();
-            leftFileSelectRef.current.value = "";
-            rightFileSelectRef.current.value = "";
-            setLeftSheetlist(null);
-            setRightSheetlist(null);
-            setLeftSheetname("Sheet1");
-            setRightSheetname("Sheet1");
-            setLeftSheetData(
-              JSON.parse(JSON.stringify(ExcelHelper.BlankData(12, 8)))
-            );
-            setRightSheetData(
-              JSON.parse(JSON.stringify(ExcelHelper.BlankData(12, 8)))
-            );
-          }}
-        />
+        <CenterHooks onDiff={onDiff} onSample={onSample} onReset={onRset}/>
       </Col>
       <Col span={11}>
-        <RightHooks
+        <LeftHooks
           sheetname={rightsheetname}
           sheetlist={rightsheetlist}
           onFileSelectChange={(e) => fileHandler(e, "right")}
-          onSheetSelectChange={(e) => onSheetFieldChange(e, "right")}
-          hotTableComponentRight={hotTableComponentRight}
+          onSheetSelectChange={(value) => onSheetFieldChange(value, "right")}
           sheetdata={rightsheetdata}
           fileRef={rightFileSelectRef}
         />
       </Col>
       <Col span={24} style={{ textAlign: "center" }}>
-        <DiffResultHooks hotTableComponentDiffResult={hotTableComponentDiffResult} />
+        <DiffResultHooks data={diffData} />
       </Col>
     </Row>
   );

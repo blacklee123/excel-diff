@@ -1,12 +1,13 @@
 import React from "react";
 import { HotTable } from "@handsontable/react";
 import { renderDiff } from "../utils/RenderDiffTable";
+import Handsontable from "handsontable";
 
 interface DiffResult {
-  hotTableComponentDiffResult: React.RefObject<any>;
+  data: any[][] | Handsontable.RowObject[];
 }
 
-const DiffResultHooks = (props: DiffResult) => {
+const DiffResultHooks: React.FC<DiffResult> = ({data}) => {
   const hotDiffResultSettings = {
     minRows: 10,
     minCols: 10,
@@ -24,10 +25,7 @@ const DiffResultHooks = (props: DiffResult) => {
     <>
       <span style={{ fontSize: 24 }}>{"比较结果"}</span>
       <HotTable
-        ref={props.hotTableComponentDiffResult}
-        data={[[""]]}
-        style={{ width: "100%", padding: 15 }}
-        id={"tableresult"}
+        data={data}
         settings={hotDiffResultSettings}
         renderer={renderDiff}
         className="diffhandsontable"

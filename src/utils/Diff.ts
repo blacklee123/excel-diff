@@ -1,7 +1,6 @@
 const daff = require("daff");
 
-export const diff = (left: [][], right: [][], ref: React.RefObject<any>) => {
-  var instance = ref.current.hotInstance;
+export const diff = (left: [][], right: [][]) => {
   var result = [];
   let tableLeft = new daff.TableView(left);
   let tableRight = new daff.TableView(right);
@@ -25,6 +24,7 @@ export const diff = (left: [][], right: [][], ref: React.RefObject<any>) => {
 
   if (output.height !== 0) {
     result = output.data;
-    instance.loadData(result);
+    return result;
   }
+  return [];
 };
