@@ -1,30 +1,28 @@
 const daff = require("daff");
 
 export const diff = (left: [][], right: [][]) => {
-  var result = [];
-  let tableLeft = new daff.TableView(left);
-  let tableRight = new daff.TableView(right);
+  const tableLeft = new daff.TableView(left);
+  const tableRight = new daff.TableView(right);
 
   tableLeft.trim();
   tableRight.trim();
 
-  var ct = daff.compareTables(tableLeft, tableRight);
+  const ct = daff.compareTables(tableLeft, tableRight);
 
-  let align = ct.align();
-  let output = new daff.TableView([]);
-  let flags = new daff.CompareFlags();
+  const align = ct.align();
+  const output = new daff.TableView([]);
+  const flags = new daff.CompareFlags();
   flags.show_unchanged = false;
   flags.always_show_header = true;
   flags.always_show_order = true;
   flags.never_show_order = false;
   flags.unchanged_context = true;
 
-  var td = new daff.TableDiff(align, flags);
+  const td = new daff.TableDiff(align, flags);
   td.hilite(output);
 
   if (output.height !== 0) {
-    result = output.data;
-    return result;
+    return output.data;
   }
   return [];
 };

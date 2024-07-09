@@ -1,19 +1,19 @@
 import React from "react";
 import { Input, Select } from "antd";
-import Handsontable from "handsontable";
+
 import { HotTable } from "@handsontable/react";
 
+import type { ExcelDomain } from "../utils/ExcelHelper";
+
 interface Import {
-  sheetname: string;
-  sheetlist: string[];
+  data: ExcelDomain
   fileRef: React.RefObject<any>;
   onFileSelectChange(e: React.ChangeEvent<HTMLInputElement>): any;
   onSheetSelectChange(value: string): any;
 }
 
 const ImportHooks: React.FC<Import> = ({
-  sheetname,
-  sheetlist,
+  data,
   fileRef,
   onFileSelectChange,
   onSheetSelectChange
@@ -26,29 +26,28 @@ const ImportHooks: React.FC<Import> = ({
         onChange={(e) => onFileSelectChange(e)}
         ref={fileRef}
       ></input>
-      <Select
-        value={sheetname}
-        options={sheetlist.map((sheet) => ({ value: sheet, label: sheet }))}
-        onChange={(value) => onSheetSelectChange(value)}>
-      </Select>
+      {
+        data.workbook && <Select
+          value={data.sheetname}
+          options={data.sheets.map((sheet) => ({ value: sheet, label: sheet }))}
+          onChange={(value) => onSheetSelectChange(value)}>
+        </Select>
+      }
+
     </Input.Group>
   );
 };
 
 interface Left {
-  sheetname: string;
-  sheetlist: string[];
+  data: ExcelDomain;
   fileRef: React.RefObject<any>;
-  sheetdata: any[][] | Handsontable.RowObject[];
   onFileSelectChange(e: React.ChangeEvent<HTMLInputElement>): any;
   onSheetSelectChange(e: string): any;
 }
 
 const LeftHooks: React.FC<Left> = ({
-  sheetname,
-  sheetlist,
+  data,
   fileRef,
-  sheetdata,
   onFileSelectChange,
   onSheetSelectChange
 }) => {
@@ -63,14 +62,13 @@ const LeftHooks: React.FC<Left> = ({
   return (
     <>
       <ImportHooks
-        sheetname={sheetname}
-        sheetlist={sheetlist}
+        data={data}
         fileRef={fileRef}
         onFileSelectChange={onFileSelectChange}
         onSheetSelectChange={onSheetSelectChange}
       />
       <HotTable
-        data={sheetdata}
+        data={data.items}
         settings={hotLeftSettings}
         stretchH={"all"}
       />

@@ -11,11 +11,11 @@ export function renderDiff(
   value: Handsontable.CellValue,
   cellProperties: Handsontable.CellProperties
 ) {
-  var tt = new Cell(value, instance);
-  var view = new daff.coopy.SimpleView();
-  var cell = daff.coopy.DiffRender.renderCell(tt, view, col, row);
-  var className = cell.category;
-  var value2 = cell.pretty_value;
+  const tt = new Cell(value, instance);
+  const view = new daff.coopy.SimpleView();
+  const cell = daff.coopy.DiffRender.renderCell(tt, view, col, row);
+  const className = cell.category;
+  const value2 = cell.pretty_value;
   if (className !== "") {
     td.className = className;
   }
