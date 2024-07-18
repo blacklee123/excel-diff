@@ -1,6 +1,7 @@
 import React from "react";
 import { Input, Select } from "antd";
 
+import Handsontable from 'handsontable/base';
 import { HotTable } from "@handsontable/react";
 
 import type { ExcelDomain } from "../utils/ExcelHelper";
@@ -20,12 +21,7 @@ const ImportHooks: React.FC<Import> = ({
 }) => {
   return (
     <Input.Group compact>
-      <input
-        type="file"
-        accept=".xlsx"
-        onChange={(e) => onFileSelectChange(e)}
-        ref={fileRef}
-      ></input>
+      <input ref={fileRef} type="file" accept=".xlsx" onChange={(e) => onFileSelectChange(e)} />
       {
         data.workbook && <Select
           value={data.sheetname}
@@ -33,7 +29,6 @@ const ImportHooks: React.FC<Import> = ({
           onChange={(value) => onSheetSelectChange(value)}>
         </Select>
       }
-
     </Input.Group>
   );
 };
@@ -51,12 +46,13 @@ const LeftHooks: React.FC<Left> = ({
   onFileSelectChange,
   onSheetSelectChange
 }) => {
-  const hotLeftSettings = {
-    minRows: 12,
-    minCols: 8,
+  const hotLeftSettings: Handsontable.GridSettings = {
+    // minRows: 12,
+    // minCols: 8,
     colHeaders: true,
     rowHeaders: true,
     height: 305,
+    stretchH: "all",
     licenseKey: "non-commercial-and-evaluation",
   };
   return (
@@ -70,7 +66,6 @@ const LeftHooks: React.FC<Left> = ({
       <HotTable
         data={data.items}
         settings={hotLeftSettings}
-        stretchH={"all"}
       />
     </>
   );

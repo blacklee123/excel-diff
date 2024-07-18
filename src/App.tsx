@@ -9,27 +9,27 @@ import LeftHooks from "./components/Left";
 import CenterHooks from "./components/Center";
 import DiffResultHooks from "./components/DiffResult";
 
-import "handsontable/dist/handsontable.full.css";
 import "./App.css";
+
 
 function App() {
 
   const [leftDomain, setLeftDomain] = useState<ExcelDomain>({
     sheetname: "Sheet1",
     sheets: [],
-    items: JSON.parse(JSON.stringify(BlankData(12, 8))),
+    items: BlankData(12, 8),
     workbook: undefined,
   });
   const [rightDomain, setRightDomain] = useState<ExcelDomain>({
     sheetname: "Sheet1",
     sheets: [],
-    items: JSON.parse(JSON.stringify(BlankData(12, 8))),
+    items: BlankData(12, 8),
     workbook: undefined,
   });
   const leftFileSelectRef = useRef<any>(null);
   const rightFileSelectRef = useRef<any>(null);
 
-  const [diffData, setDiffData] = useState<[][]>([[]]);
+  const [diffData, setDiffData] = useState<[any[][], string]>([[['']],'']);
 
   const fileHandler = (event: React.ChangeEvent<HTMLInputElement>, field: string) => {
     event.persist();
@@ -63,16 +63,16 @@ function App() {
     setLeftDomain({
       sheetname: "Sheet1",
       sheets: [],
-      items: JSON.parse(JSON.stringify(BlankData(12, 8))),
+      items: BlankData(12, 8),
       workbook: undefined,
     })
     setRightDomain({
       sheetname: "Sheet1",
       sheets: [],
-      items: JSON.parse(JSON.stringify(BlankData(12, 8))),
+      items: BlankData(12, 8),
       workbook: undefined,
     })
-    setDiffData([[]]);
+    setDiffData([[['']], '']);
   }
 
   const onDiff = () => {

@@ -3,7 +3,7 @@ import type { WorkBook } from "xlsx";
 
 export interface ExcelDomain {
   sheetname: string;
-  items: any[];
+  items: any[][];
   sheets: string[];
   workbook: XLSX.WorkBook | undefined;
 }

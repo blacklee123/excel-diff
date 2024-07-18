@@ -1,16 +1,16 @@
 import React from "react";
 import { HotTable } from "@handsontable/react";
 import { renderDiff } from "../utils/RenderDiffTable";
-import Handsontable from "handsontable";
+import Handsontable from "handsontable/base";
 
 interface DiffResult {
-  data: any[][] | Handsontable.RowObject[];
+  data: [any[][], string];
 }
 
 const DiffResultHooks: React.FC<DiffResult> = ({data}) => {
-  const hotDiffResultSettings = {
-    minRows: 10,
-    minCols: 10,
+  const hotDiffResultSettings : Handsontable.GridSettings = {
+    // minRows: 10,
+    // minCols: 10,
     minSpareCols: 0,
     minSpareRows: 0,
     colHeaders: false,
@@ -18,6 +18,7 @@ const DiffResultHooks: React.FC<DiffResult> = ({data}) => {
     rowHeaders: false,
     readOnly: true,
     renderAllRows: true,
+    stretchH: "all",
     licenseKey: "non-commercial-and-evaluation",
   };
 
@@ -25,12 +26,12 @@ const DiffResultHooks: React.FC<DiffResult> = ({data}) => {
     <>
       <span style={{ fontSize: 24 }}>{"比较结果"}</span>
       <HotTable
-        data={data}
+        data={data[0]}
         settings={hotDiffResultSettings}
         renderer={renderDiff}
         className="diffhandsontable"
-        stretchH={"all"}
       />
+      {/* <div dangerouslySetInnerHTML={{ __html: data[1] }} /> */}
     </>
   );
 };
