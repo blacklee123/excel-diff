@@ -9,12 +9,14 @@ import { HotTable } from "@handsontable/react";
 import type { ExcelDomain } from "../utils/ExcelHelper";
 
 interface Left {
+  title?: string
   data: ExcelDomain;
-  onFileSelectChange(file: RcFile|null): any;
+  onFileSelectChange(file: RcFile | null): any;
   onSheetSelectChange(e: string): any;
 }
 
 const LeftHooks: React.FC<Left> = ({
+  title,
   data,
   onFileSelectChange,
   onSheetSelectChange
@@ -32,7 +34,7 @@ const LeftHooks: React.FC<Left> = ({
   const props: UploadProps = {
     fileList: data.fileList,
     maxCount: 1,
-    onRemove: file=> {
+    onRemove: file => {
       onFileSelectChange(null)
     },
     beforeUpload: file => {
@@ -47,6 +49,7 @@ const LeftHooks: React.FC<Left> = ({
         <input ref={fileRef} type="file" accept=".xlsx" onChange={(e) => onFileSelectChange(e)} />
       </Input.Group> */}
       <Upload {...props}>
+        {title}
         <Button icon={<UploadOutlined />}>Select File</Button>
       </Upload>
       <div>
