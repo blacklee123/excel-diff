@@ -1,73 +1,67 @@
 import React from "react";
-import { Input, Select } from "antd";
+import { Tabs, Space, Upload, Button } from "antd";
+import { UploadOutlined } from '@ant-design/icons';
+import type { RcFile, UploadProps } from 'antd/es/upload/interface';
 
 import Handsontable from 'handsontable/base';
 import { HotTable } from "@handsontable/react";
 
 import type { ExcelDomain } from "../utils/ExcelHelper";
 
-interface Import {
-  data: ExcelDomain
-  fileRef: React.RefObject<any>;
-  onFileSelectChange(e: React.ChangeEvent<HTMLInputElement>): any;
-  onSheetSelectChange(value: string): any;
-}
-
-const ImportHooks: React.FC<Import> = ({
-  data,
-  fileRef,
-  onFileSelectChange,
-  onSheetSelectChange
-}) => {
-  return (
-    <Input.Group compact>
-      <input ref={fileRef} type="file" accept=".xlsx" onChange={(e) => onFileSelectChange(e)} />
-      {
-        data.workbook && <Select
-          value={data.sheetname}
-          options={data.sheets.map((sheet) => ({ value: sheet, label: sheet }))}
-          onChange={(value) => onSheetSelectChange(value)}>
-        </Select>
-      }
-    </Input.Group>
-  );
-};
-
 interface Left {
   data: ExcelDomain;
-  fileRef: React.RefObject<any>;
-  onFileSelectChange(e: React.ChangeEvent<HTMLInputElement>): any;
+  onFileSelectChange(file: RcFile|null): any;
   onSheetSelectChange(e: string): any;
 }
 
 const LeftHooks: React.FC<Left> = ({
   data,
-  fileRef,
   onFileSelectChange,
   onSheetSelectChange
 }) => {
   const hotLeftSettings: Handsontable.GridSettings = {
-    // minRows: 12,
-    // minCols: 8,
+    minRows: 12,
+    minCols: 4,
     colHeaders: true,
     rowHeaders: true,
     height: 305,
     stretchH: "all",
     licenseKey: "non-commercial-and-evaluation",
   };
+
+  const props: UploadProps = {
+    fileList: data.fileList,
+    maxCount: 1,
+    onRemove: file=> {
+      onFileSelectChange(null)
+    },
+    beforeUpload: file => {
+      onFileSelectChange(file)
+      return false;
+    },
+    // fileList,
+  };
   return (
-    <>
-      <ImportHooks
-        data={data}
-        fileRef={fileRef}
-        onFileSelectChange={onFileSelectChange}
-        onSheetSelectChange={onSheetSelectChange}
-      />
-      <HotTable
-        data={data.items}
-        settings={hotLeftSettings}
-      />
-    </>
+    <Space direction="vertical" style={{ width: "100%" }}>
+      {/* <Input.Group compact>
+        <input ref={fileRef} type="file" accept=".xlsx" onChange={(e) => onFileSelectChange(e)} />
+      </Input.Group> */}
+      <Upload {...props}>
+        <Button icon={<UploadOutlined />}>Select File</Button>
+      </Upload>
+      <div>
+        <HotTable data={data.items} settings={hotLeftSettings} />
+        {
+          data.workbook && <Tabs
+            type="card"
+            tabPosition="bottom"
+            items={data.sheets.map((sheet) => ({ label: sheet, key: sheet }))}
+            activeKey={data.sheetname}
+            onChange={(value) => onSheetSelectChange(value)}>
+          </Tabs>
+        }
+      </div>
+    </Space>
   );
 };
 

@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
-import { Row, Col } from "antd";
+import { useState } from "react";
+import { Row, Col, Layout } from "antd";
+import type { RcFile } from 'antd/es/upload/interface';
 
 import { convertFileToExcel, getSheet, SampleDataLeft, SampleDataRight, BlankData } from "./utils/ExcelHelper";
 import type { ExcelDomain } from "./utils/ExcelHelper";
@@ -11,30 +12,30 @@ import DiffResultHooks from "./components/DiffResult";
 
 import "./App.css";
 
+const initialData: ExcelDomain = {
+  sheetname: "Sheet1",
+  sheets: [],
+  items: BlankData(12, 8),
+  workbook: undefined,
+  fileList: []
+}
 
 function App() {
 
-  const [leftDomain, setLeftDomain] = useState<ExcelDomain>({
-    sheetname: "Sheet1",
-    sheets: [],
-    items: BlankData(12, 8),
-    workbook: undefined,
-  });
-  const [rightDomain, setRightDomain] = useState<ExcelDomain>({
-    sheetname: "Sheet1",
-    sheets: [],
-    items: BlankData(12, 8),
-    workbook: undefined,
-  });
-  const leftFileSelectRef = useRef<any>(null);
-  const rightFileSelectRef = useRef<any>(null);
+  const [leftDomain, setLeftDomain] = useState<ExcelDomain>(initialData);
+  const [rightDomain, setRightDomain] = useState<ExcelDomain>(initialData);
 
-  const [diffData, setDiffData] = useState<[any[][], string]>([[['']],'']);
+  const [diffData, setDiffData] = useState<[any[][], string]>([[], '']);
 
-  const fileHandler = (event: React.ChangeEvent<HTMLInputElement>, field: string) => {
-    event.persist();
-    if (event.target.files) {
-      convertFileToExcel(event.target.files[0]).then((resp) => {
+  const fileHandler = (file: RcFile | null, field: string) => {
+    if (file === null) {
+      if (field === "left") {
+        setLeftDomain(initialData)
+      } else {
+        setRightDomain(initialData)
+      }
+    } else {
+      convertFileToExcel(file).then((resp) => {
         if (field === "left") {
           setLeftDomain(resp);
         } else {
@@ -60,19 +61,9 @@ function App() {
   };
 
   const onRset = () => {
-    setLeftDomain({
-      sheetname: "Sheet1",
-      sheets: [],
-      items: BlankData(12, 8),
-      workbook: undefined,
-    })
-    setRightDomain({
-      sheetname: "Sheet1",
-      sheets: [],
-      items: BlankData(12, 8),
-      workbook: undefined,
-    })
-    setDiffData([[['']], '']);
+    setLeftDomain(initialData)
+    setRightDomain(initialData)
+    setDiffData([[], '']);
   }
 
   const onDiff = () => {
@@ -85,30 +76,34 @@ function App() {
   }
 
   return (
-    <Row gutter={[24, 24]} style={{ padding: "48px" }}>
-      <Col span={11}>
-        <LeftHooks
-          data={leftDomain}
-          fileRef={leftFileSelectRef}
-          onFileSelectChange={(e) => fileHandler(e, "left")}
-          onSheetSelectChange={(e) => onSheetFieldChange(e, "left")}
-        />
-      </Col>
-      <Col span={2}>
-        <CenterHooks onDiff={onDiff} onSample={onSample} onReset={onRset} />
-      </Col>
-      <Col span={11}>
-        <LeftHooks
-          data={rightDomain}
-          fileRef={rightFileSelectRef}
-          onFileSelectChange={(e) => fileHandler(e, "right")}
-          onSheetSelectChange={(value) => onSheetFieldChange(value, "right")}
-        />
-      </Col>
-      <Col span={24} style={{ textAlign: "center" }}>
-        <DiffResultHooks data={diffData} />
-      </Col>
-    </Row>
+    <Layout style={{ minHeight: "100vh" }}>
+      <Layout.Content>
+        <Row gutter={[24, 24]} style={{ padding: '4px' }}>
+          <Col span={11}>
+            <LeftHooks
+              data={leftDomain}
+              onFileSelectChange={(e) => fileHandler(e, "left")}
+              onSheetSelectChange={(e) => onSheetFieldChange(e, "left")}
+            />
+          </Col>
+          <Col span={2} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CenterHooks onDiff={onDiff} onSample={onSample} onReset={onRset} />
+          </Col>
+          <Col span={11}>
+            <LeftHooks
+              data={rightDomain}
+              onFileSelectChange={(e) => fileHandler(e, "right")}
+              onSheetSelectChange={(value) => onSheetFieldChange(value, "right")}
+            />
+          </Col>
+          {
+            diffData[0].length > 0 && <Col span={24}>
+              <DiffResultHooks data={diffData[0]} />
+            </Col>
+          }
+        </Row>
+      </Layout.Content>
+    </Layout>
   );
 }
 

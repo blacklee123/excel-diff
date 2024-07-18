@@ -4,7 +4,7 @@ import { renderDiff } from "../utils/RenderDiffTable";
 import Handsontable from "handsontable/base";
 
 interface DiffResult {
-  data: [any[][], string];
+  data: any[][];
 }
 
 const DiffResultHooks: React.FC<DiffResult> = ({data}) => {
@@ -24,9 +24,9 @@ const DiffResultHooks: React.FC<DiffResult> = ({data}) => {
 
   return (
     <>
-      <span style={{ fontSize: 24 }}>{"比较结果"}</span>
+      <div style={{ fontSize: 24, textAlign: 'center' }}>{"比较结果"}</div>
       <HotTable
-        data={data[0]}
+        data={data}
         settings={hotDiffResultSettings}
         renderer={renderDiff}
         className="diffhandsontable"

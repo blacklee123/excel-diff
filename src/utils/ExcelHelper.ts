@@ -1,14 +1,16 @@
 import * as XLSX from "xlsx";
 import type { WorkBook } from "xlsx";
+import type { RcFile, UploadFile } from "antd/lib/upload";
 
 export interface ExcelDomain {
   sheetname: string;
   items: any[][];
   sheets: string[];
   workbook: XLSX.WorkBook | undefined;
+  fileList: UploadFile[]
 }
 
-export const convertFileToExcel = (file: Blob): Promise<ExcelDomain> => {
+export const convertFileToExcel = (file: RcFile): Promise<ExcelDomain> => {
   return new Promise((resolve, reject) => {
     var reader = new FileReader();
     reader.onload = function (e) {
@@ -22,6 +24,7 @@ export const convertFileToExcel = (file: Blob): Promise<ExcelDomain> => {
         items: XLSX.utils.sheet_to_json(ws, { header: 1 }),
         sheets: wb.SheetNames,
         workbook: wb,
+        fileList: [file as UploadFile ]
       };
 
       resolve(data);

@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client'
+import { ConfigProvider } from 'antd';
+import zhCN from 'antd/es/locale/zh_CN'
+
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import "antd/dist/antd.css";
@@ -10,7 +13,12 @@ registerAllModules();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <ConfigProvider
+      locale={zhCN}
+      componentSize="middle"
+    >
+      <App />
+    </ConfigProvider>
   </React.StrictMode>,
 )
 
